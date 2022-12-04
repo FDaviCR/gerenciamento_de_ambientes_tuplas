@@ -97,9 +97,35 @@ def listarProcessos(ts):
     
     return list(processos[1])
 
+'''
+-----------------------------------------------------------------------------------------
+-------------------------------- ENTRADAS NOS CONTEINERS --------------------------------
+-----------------------------------------------------------------------------------------
+'''
+# Add host na nuvem em que entrou
+def entrarNuvem(ts, nome, nomeNuvem):
+    integrantes = ts.inp(("INTNUVEM", nomeNuvem, object))
+    temp = list(integrantes[2])
+    temp.append(nome)
+    ts.out(("INTNUVEM", nomeNuvem, tuple(temp)))
+    print("Host: " + nome + "entrou na nuvem: " + nomeNuvem)
+    
+# Add vm no host em que entrou
+def entrarHost(ts, nome, nomeHost):
+    integrantes = ts.inp(("INTHOST", nomeHost, object))
+    temp = list(integrantes[2])
+    temp.append(nome)
+    ts.out(("INTHOST", nomeHost, tuple(temp)))
+    print("VM: " + nome + "entrou no host: " + nomeHost)
 
-
-
+# Add processo no vm em que entrou
+def entrarVM(ts, nome, nomeVM):
+    integrantes = ts.inp(("INTVM", nomeVM, object))
+    temp = list(integrantes[2])
+    temp.append(nome)
+    ts.out(("INTVM", nomeVM, tuple(temp)))
+    print("Processo: " + nome + "entrou na VM: " + nomeVM)
+    
 '''
 -----------------------------------------------------------------------------------------
 -------------------------------- MAIN PARA INICIALIZAÇÃO --------------------------------
