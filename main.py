@@ -212,6 +212,26 @@ def deletarProcesso(ts, nome):
     temp.remove(nome)
     ts.out(("PROCESSOS", tuple(temp)))
 
+'''
+-----------------------------------------------------------------------------------------
+---------------------------- FUNÇÕES PARA TROCA DE MENSAGENS ----------------------------
+-----------------------------------------------------------------------------------------
+'''
+# Add as mensagens a Lista de mensagens que a VM em específico do chat do processo possui
+def mandarMensagem(ts, nomeVM, remetente, destinatario, mensagem):
+    mensagens = ts.inp(("VM", nomeVM, object))
+    temp = list(mensagens[2])
+    temp.clear()
+    
+    temp.append((destinatario,"<" + remetente + ">: " + mensagem))
+            
+    ts.out(("VM", nomeVM, tuple(temp)))
+
+# Retorna a ''última mensagem enviada'' no chat de Tuplas
+def receberMensagem(ts, nomeVM):
+    mensagens = ts.rdp(("VM", nomeVM, object))
+    #print("Recebe MSG " + str(mensagens))
+    return list(mensagens[2])
 
 '''
 -----------------------------------------------------------------------------------------
