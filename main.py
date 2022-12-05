@@ -66,7 +66,7 @@ def criarProcesso(ts, nomeProcesso):
 
 '''
 -----------------------------------------------------------------------------------------
--------------------------- CRIAÇÃO DAS LISTAGENS DE CONTEINERS --------------------------
+-------------------------------- LISTAGENS DE CONTEINERS --------------------------------
 -----------------------------------------------------------------------------------------
 '''
 # Listar TODAS as NUVENS do 'ts' ('Tuple Space')
@@ -126,6 +126,33 @@ def entrarVM(ts, nome, nomeVM):
     ts.out(("INTVM", nomeVM, tuple(temp)))
     print("Processo: " + nome + "entrou na VM: " + nomeVM)
     
+'''
+-----------------------------------------------------------------------------------------
+--------------------------------- SAIDAS DOS CONTEINERS ---------------------------------
+-----------------------------------------------------------------------------------------
+'''
+# Retira host da nuvem em que entrou
+def sairNuvem(ts, nome, nomeNuvem):
+    integrantes = ts.inp(("INTNUVEM", nomeNuvem, object))
+    temp = list(integrantes[2])
+    temp.remove(nome)
+    ts.out(("INTNUVEM", nomeNuvem, tuple(temp)))
+    
+# Retira vm do host em que entrou
+def sairHost(ts, nome, nomeHost):
+    integrantes = ts.inp(("INTHOST", nomeHost, object))
+    temp = list(integrantes[2])
+    temp.remove(nome)
+    ts.out(("INTHOST", nomeHost, tuple(temp)))
+
+# Retira processo da vm em que entrou
+def sairVM(ts, nome, nomeVM):
+    integrantes = ts.inp(("INTNUVEM", nomeVM, object))
+    temp = list(integrantes[2])
+    temp.remove(nome)
+    ts.out(("INTNUVEM", nomeVM, tuple(temp)))
+
+
 '''
 -----------------------------------------------------------------------------------------
 -------------------------------- MAIN PARA INICIALIZAÇÃO --------------------------------
