@@ -99,6 +99,30 @@ def listarProcessos(ts):
 
 '''
 -----------------------------------------------------------------------------------------
+------------------------ LISTAGENS DE INTEGRANTES DOS CONTEINERs ------------------------
+-----------------------------------------------------------------------------------------
+'''
+# Lista integrantes de uma sala em específico 'nomeSala' 
+def listarIntegrantesNuvem(ts, nomeNuvem):
+    integrantes = ts.rdp(("INTNUVEM", nomeNuvem, object))
+    print(integrantes)
+    return list(integrantes[2])
+
+# Lista integrantes de uma sala em específico 'nomeSala' 
+def listarIntegrantesHost(ts, nomeHost):
+    integrantes = ts.rdp(("INTHOST", nomeHost, object))
+    print(integrantes)
+    return list(integrantes[2])
+
+# Lista integrantes de uma sala em específico 'nomeSala' 
+def listarIntegrantesVM(ts, nomeVM):
+    integrantes = ts.rdp(("INTVM", nomeVM, object))
+    print(integrantes)
+    return list(integrantes[2])
+
+
+'''
+-----------------------------------------------------------------------------------------
 -------------------------------- ENTRADAS NOS CONTEINERS --------------------------------
 -----------------------------------------------------------------------------------------
 '''
