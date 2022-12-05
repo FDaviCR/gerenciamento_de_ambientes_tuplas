@@ -120,7 +120,6 @@ def listarIntegrantesVM(ts, nomeVM):
     print(integrantes)
     return list(integrantes[2])
 
-
 '''
 -----------------------------------------------------------------------------------------
 -------------------------------- ENTRADAS NOS CONTEINERS --------------------------------
@@ -152,7 +151,7 @@ def entrarVM(ts, nome, nomeVM):
     
 '''
 -----------------------------------------------------------------------------------------
---------------------------------- SAIDAS DOS CONTEINERS ---------------------------------
+-------------------------- SAIDAS DO CONTEINER DE INTEGRANTES ---------------------------
 -----------------------------------------------------------------------------------------
 '''
 # Retira host da nuvem em que entrou
@@ -175,6 +174,43 @@ def sairVM(ts, nome, nomeVM):
     temp = list(integrantes[2])
     temp.remove(nome)
     ts.out(("INTNUVEM", nomeVM, tuple(temp)))
+
+'''
+-----------------------------------------------------------------------------------------
+-------------------------------- REMOVER DOS CONTEINERS ---------------------------------
+-----------------------------------------------------------------------------------------
+'''
+# Retira a tupla do nuvem da tupla 'NUVENS' aonde foi armazenada
+def deletarNuvem(ts, nome):
+    nuvens = ts.inp(("NUVENS", object))
+    temp = list(nuvens[1])
+    print(temp)
+    temp.remove(nome)
+    ts.out(("NUVENS", tuple(temp)))
+
+# Retira a tupla do host da tupla 'HOSTS' aonde foi armazenada
+def deletarHost(ts, nome):
+    hosts = ts.inp(("HOSTS", object))
+    temp = list(hosts[1])
+    print(temp)
+    temp.remove(nome)
+    ts.out(("HOSTS", tuple(temp)))
+
+# Retira a tupla do vm da tupla 'VMS' aonde foi armazenada
+def deletarVM(ts, nome):
+    vms = ts.inp(("VMS", object))
+    temp = list(vms[1])
+    print(temp)
+    temp.remove(nome)
+    ts.out(("VMS", tuple(temp)))
+
+# Retira a tupla do processo da tupla 'PROCESSOS' aonde foi armazenada
+def deletarProcesso(ts, nome):
+    processos = ts.inp(("PROCESSOS", object))
+    temp = list(processos[1])
+    print(temp)
+    temp.remove(nome)
+    ts.out(("PROCESSOS", tuple(temp)))
 
 
 '''
