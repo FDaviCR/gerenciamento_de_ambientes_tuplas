@@ -234,6 +234,34 @@ def receberMensagem(ts, nomeVM):
     return list(mensagens[2])
 
 '''
+-------------------------------------------------------------------------------------------------
+---------------------------------- CONSTRUÇÃO DA INTERFACE GRAFICA ------------------------------
+-------------------------------------------------------------------------------------------------
+'''
+
+root = Tk()
+root.withdraw()
+
+def fecharAplicacao(Toplevel):
+    Toplevel.destroy()      
+    Toplevel.quit()
+    root.destroy()
+    os._exit(1) 
+    
+def fecharJanelaTopLevel(Toplevel):
+    Toplevel.destroy()
+    
+def janelaInicial():
+    newWindow = Toplevel(root)
+    newWindow.title("ET: Tela Inicial")
+    newWindow.geometry("800x700")
+
+    newWindow.protocol("WM_DELETE_WINDOW", lambda:fecharAplicacao(newWindow))
+
+    cria_usuario_button = Button(newWindow,text="Teste", command=lambda:print("Cliquei!"))
+    cria_usuario_button.place(x=100, y=200)
+
+'''
 -----------------------------------------------------------------------------------------
 -------------------------------- MAIN PARA INICIALIZAÇÃO --------------------------------
 -----------------------------------------------------------------------------------------
@@ -251,4 +279,5 @@ if __name__ == "__main__":
     tse.out(("VMS", tuple(vms)))
     tse.out(("PROCESSOS", tuple(processos)))
 
-    #root.mainloop()
+    janelaInicial()
+    root.mainloop()
