@@ -250,16 +250,62 @@ def fecharAplicacao(Toplevel):
     
 def fecharJanelaTopLevel(Toplevel):
     Toplevel.destroy()
-    
+
 def janelaInicial():
     newWindow = Toplevel(root)
     newWindow.title("ET: Tela Inicial")
-    newWindow.geometry("800x700")
+    newWindow.geometry("700x300")
+    newWindow.configure(bg='#2288BB')
 
     newWindow.protocol("WM_DELETE_WINDOW", lambda:fecharAplicacao(newWindow))
+    
+    labelText = Label(newWindow, text="Gerenciador de Ambientes", width=33, height=5, bg="#FFF00F").grid(row=0, column=1)
+    
+    labelText = Label(newWindow, text="", width=33, bg='#2288BB').grid(row=1, column=0)
+    labelText = Label(newWindow, text="", width=33, bg='#2288BB').grid(row=1, column=1)
+    labelText = Label(newWindow, text="", width=33, bg='#2288BB').grid(row=1, column=2)
+    
+    criarNuvemButton = Button(newWindow,text="Criar Nuvem", width=30,command=lambda:janelaConfNuvem()).grid(row=2,column=0)    
+    verNuvemButton = Button(newWindow,text="Ver Nuvens", width=30,command=lambda:print("Abrir lista de nuvens")).grid(row=2,column=1)
+    
+    #criarHostLabel = Label(newWindow, text="Nome do Host").grid(row=3,column=0)
+    criarHostButton = Button(newWindow,text="Criar Host", width=30, command=lambda:janelaConfHost()).grid(row=3,column=0)  
+    verHostButton = Button(newWindow,text="Ver Hosts", width=30,command=lambda:print("Abrir lista de hosts")).grid(row=3,column=1)
+    
+    #criarVMLabel = Label(newWindow, text="Nome do VM").grid(row=4,column=0)
+    criarVMButton = Button(newWindow,text="Criar VM", width=30,command=lambda:janelaConfVM()).grid(row=4,column=0)    
+    verVMButton = Button(newWindow,text="Ver VMs", width=30,command=lambda:print("Abrir lista de hosts")).grid(row=4,column=1)
+    
+    #criarProcessoLabel = Label(newWindow, text="Nome do Processo").grid(row=5,column=0)
+    criarProcessoButton = Button(newWindow,text="Criar Processo",width=30, command=lambda:janelaConfProcesso()).grid(row=5,column=0)    
+    verProcessoButton = Button(newWindow,text="Ver Processos",width=30, command=lambda:print("Abrir lista de hosts")).grid(row=5,column=1)   
 
-    cria_usuario_button = Button(newWindow,text="Teste", command=lambda:print("Cliquei!"))
-    cria_usuario_button.place(x=100, y=200)
+def janelaConfNuvem():
+    newWindow = Toplevel(root)
+    newWindow.title("ET: Configuração de Nuvem")
+    newWindow.geometry("400x200")
+    newWindow.configure(bg='#888888')
+    
+    criarNuvemLabel = Label(newWindow, text="Configuração de Nuvem").grid(row=1)
+    criarNuvemLabel = Label(newWindow, text="Nome da Nuvem").grid(row=2)
+
+def janelaConfHost():
+    newWindow = Toplevel(root)
+    newWindow.title("ET: Configuração de Host")
+    newWindow.geometry("400x200")
+    newWindow.configure(bg='#888888')
+
+def janelaConfVM():
+    newWindow = Toplevel(root)
+    newWindow.title("ET: Configuração de VM")
+    newWindow.geometry("400x200")
+    newWindow.configure(bg='#888888')
+    
+def janelaConfProcesso():
+    newWindow = Toplevel(root)
+    newWindow.title("ET: Configuração de Processo")
+    newWindow.geometry("400x200")
+    newWindow.configure(bg='#888888')
 
 '''
 -----------------------------------------------------------------------------------------
