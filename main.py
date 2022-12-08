@@ -2,9 +2,11 @@
 import sys
 import os
 import time, random
+import tkinter as tk
 
 import linsimpy
 # Bibliotecas para manipulação e construção da interface gráfica -----
+
 from tkinter import *
 from tkinter.scrolledtext import ScrolledText
 import tkinter.font as font
@@ -268,7 +270,6 @@ def janelaInicial():
     criarNuvemButton = Button(newWindow,text="Criar Nuvem", width=30,command=lambda:janelaConfNuvem()).grid(row=2,column=0)    
     verNuvemButton = Button(newWindow,text="Ver Nuvens", width=30,command=lambda:print("Abrir lista de nuvens")).grid(row=2,column=1)
     
-    #criarHostLabel = Label(newWindow, text="Nome do Host").grid(row=3,column=0)
     criarHostButton = Button(newWindow,text="Criar Host", width=30, command=lambda:janelaConfHost()).grid(row=3,column=0)  
     verHostButton = Button(newWindow,text="Ver Hosts", width=30,command=lambda:print("Abrir lista de hosts")).grid(row=3,column=1)
     
@@ -280,32 +281,110 @@ def janelaInicial():
     criarProcessoButton = Button(newWindow,text="Criar Processo",width=30, command=lambda:janelaConfProcesso()).grid(row=5,column=0)    
     verProcessoButton = Button(newWindow,text="Ver Processos",width=30, command=lambda:print("Abrir lista de hosts")).grid(row=5,column=1)   
 
+def clickCriarNuvem(ts, nomeNuvem, Toplevel):
+    criarNuvem(ts, nomeNuvem)
+    fecharJanelaTopLevel(Toplevel)
+
 def janelaConfNuvem():
-    newWindow = Toplevel(root)
-    newWindow.title("ET: Configuração de Nuvem")
-    newWindow.geometry("400x200")
-    newWindow.configure(bg='#888888')
+    global tse
+    newNuvemWindow = Toplevel(root)
+    newNuvemWindow.title("ET: Configuração de Nuvem")
+    newNuvemWindow.geometry("400x400")
+    newNuvemWindow.configure(bg='#888888')
+    newNuvemWindow.protocol("WM_DELETE_WINDOW", lambda:fecharJanelaTopLevel(newNuvemWindow))
     
-    criarNuvemLabel = Label(newWindow, text="Configuração de Nuvem").grid(row=1)
-    criarNuvemLabel = Label(newWindow, text="Nome da Nuvem").grid(row=2)
+    criarNuvemLabel = Label(newNuvemWindow, text="Configuração de Nuvem").grid(row=1)
+    textArea = ScrolledText(newNuvemWindow, wrap = WORD, width = 40, height = 6.5, bg="#FFF", font = ("Callibri",9))
+    textArea.grid(row=2)
+    
+    listagemNuvens(textArea)
+    
+    criarNuvemLabel = Label(newNuvemWindow, width = 60, text="", bg='#888888').grid(row=3)
+    criarNuvemLabel = Label(newNuvemWindow, text="Cadastrar nova nuvem").grid(row=4)
+    criarNuvemLabel = Label(newNuvemWindow, text="Nome da Nuvem").grid(row=5)
+    nuvemEntry = Entry(newNuvemWindow)
+    nuvemEntry.grid(row=6)
+    criarNuvemButton = Button(newNuvemWindow,text="Criar Nuvem", width=30, command=lambda:clickCriarNuvem(tse, nuvemEntry.get(),newNuvemWindow)).grid(row=7)
+    
 
 def janelaConfHost():
-    newWindow = Toplevel(root)
-    newWindow.title("ET: Configuração de Host")
-    newWindow.geometry("400x200")
-    newWindow.configure(bg='#888888')
+    newHostWindow = Toplevel(root)
+    newHostWindow.title("ET: Configuração de Host")
+    newHostWindow.geometry("600x200")
+    newHostWindow.configure(bg='#888888')
+    newHostWindow.protocol("WM_DELETE_WINDOW", lambda:fecharJanelaTopLevel(newHostWindow))
+    
+    criarHostLabel = Label(newHostWindow, text="Configuração de Host").grid(row=1)
+    criarHostLabel = Label(newHostWindow, text="Nome da Host").grid(row=2)
+    textArea = ScrolledText(newHostWindow, wrap = WORD, width = 40, height = 5, bg="#FFF", font = ("Callibri",9))
+    textArea.grid(row=3)
+    
+    listagemHosts(textArea)
 
 def janelaConfVM():
-    newWindow = Toplevel(root)
-    newWindow.title("ET: Configuração de VM")
-    newWindow.geometry("400x200")
-    newWindow.configure(bg='#888888')
+    newVMWindow = Toplevel(root)
+    newVMWindow.title("ET: Configuração de VM")
+    newVMWindow.geometry("400x200")
+    newVMWindow.configure(bg='#888888')
+    newVMWindow.protocol("WM_DELETE_WINDOW", lambda:fecharJanelaTopLevel(newVMWindow))
+    
+    criarVMLabel = Label(newVMWindow, text="Configuração de VM").grid(row=1)
+    criarVMLabel = Label(newVMWindow, text="Nome da VM").grid(row=2)
+    textArea = ScrolledText(newVMWindow, wrap = WORD, width = 50, height = 6.5, bg="#FFF", font = ("Callibri",9))
+    textArea.grid(row=3)
+    
+    listagemVMs(textArea)
     
 def janelaConfProcesso():
-    newWindow = Toplevel(root)
-    newWindow.title("ET: Configuração de Processo")
-    newWindow.geometry("400x200")
-    newWindow.configure(bg='#888888')
+    newProcessoWindow = Toplevel(root)
+    newProcessoWindow.title("ET: Configuração de Processo")
+    newProcessoWindow.geometry("400x200")
+    newProcessoWindow.configure(bg='#888888')
+    newProcessoWindow.protocol("WM_DELETE_WINDOW", lambda:fecharJanelaTopLevel(newProcessoWindow))
+    
+    criarProcessoLabel = Label(newProcessoWindow, text="Configuração de Processo").grid(row=1)
+    criarProcessoLabel = Label(newProcessoWindow, text="Nome da Processo").grid(row=2)
+    textArea = ScrolledText(newProcessoWindow, wrap = WORD, width = 50, height = 6.5, bg="#FFF", font = ("Callibri",9))
+    textArea.grid(row=3)
+    
+    listagemProcessos(textArea)
+
+def listagemNuvens(ScrolledText):
+    global tse
+    ScrolledText.delete('1.0', END)
+    ScrolledText.insert(tk.INSERT,"[ ! ]: NUVENS: ...\n")
+    lista = listarNuvens(tse)
+    ScrolledText.insert(tk.INSERT,str(lista)+"\n")
+    print(*lista, sep='\n')
+    ScrolledText.insert(tk.INSERT,"\n\n ...\n") 
+
+def listagemHosts(ScrolledText):
+    global tse
+    ScrolledText.delete('1.0', END)
+    ScrolledText.insert(tk.INSERT,"[ ! ]: HOSTS: ...\n")
+    lista = listarHosts(tse)
+    ScrolledText.insert(tk.INSERT,str(lista)+"\n")
+    print(*lista, sep='\n')
+    ScrolledText.insert(tk.INSERT,"\n\n ...\n") 
+
+def listagemVMs(ScrolledText):
+    global tse
+    ScrolledText.delete('1.0', END)
+    ScrolledText.insert(tk.INSERT,"[ ! ]: VMS: ...\n")
+    lista = listarVMs(tse)
+    ScrolledText.insert(tk.INSERT,str(lista)+"\n")
+    print(*lista, sep='\n')
+    ScrolledText.insert(tk.INSERT,"\n\n ...\n") 
+
+def listagemProcessos(ScrolledText):
+    global tse
+    ScrolledText.delete('1.0', END)
+    ScrolledText.insert(tk.INSERT,"[ ! ]: PROCESSOS: ...\n")
+    lista = listarProcessos(tse)
+    ScrolledText.insert(tk.INSERT,str(lista)+"\n")
+    print(*lista, sep='\n')
+    ScrolledText.insert(tk.INSERT,"\n\n ...\n") 
+
 
 '''
 -----------------------------------------------------------------------------------------
