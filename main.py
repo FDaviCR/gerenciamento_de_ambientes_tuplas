@@ -253,37 +253,74 @@ def fecharAplicacao(Toplevel):
 def fecharJanelaTopLevel(Toplevel):
     Toplevel.destroy()
 
+def janelaNomeRepetido():
+    newAlertWindow = Toplevel(root)
+    newAlertWindow.title("Alerta!")
+    newAlertWindow.geometry("300x100")
+    newAlertWindow.configure(bg='#FFFF00')
+    
+    labelText = Label(newAlertWindow, text="Já existe um conteiner com esse nome!", width=40, height=2, bg="#FFF00F").grid(row=0)
+    labelText = Label(newAlertWindow, text="Por favor escolha outro.", width=40, height=2, bg="#FFF00F").grid(row=1)
+    
+    okButton = Button(newAlertWindow, text="OK",command=lambda:fecharJanelaTopLevel(newAlertWindow))
+    okButton.grid(row=3)
+
+def janelaNomeVazio():
+    newAlertWindow = Toplevel(root)
+    newAlertWindow.title("Alerta!")
+    newAlertWindow.geometry("300x100")
+    newAlertWindow.configure(bg='#FFFF00')
+    
+    labelText = Label(newAlertWindow, text="O nome do conteiner está vazio!", width=40, height=2, bg="#FFF00F").grid(row=0)
+    okButton = Button(newAlertWindow, text="OK",command=lambda:fecharJanelaTopLevel(newAlertWindow))
+    okButton.grid(row=1)
+    
+def janelaConteinerPaiInexistente():
+    newAlertWindow = Toplevel(root)
+    newAlertWindow.title("Alerta!")
+    newAlertWindow.geometry("300x100")
+    newAlertWindow.configure(bg='#FFFF00')
+    
+    labelText = Label(newAlertWindow, text="O conteiner pai não existe!", width=40, height=2, bg="#FFF00F").grid(row=0)
+    labelText = Label(newAlertWindow, text="Por favor informe um valido.", width=40, height=2, bg="#FFF00F").grid(row=1)
+    okButton = Button(newAlertWindow, text="OK",command=lambda:fecharJanelaTopLevel(newAlertWindow))
+    okButton.grid(row=2)
+
 def janelaInicial():
     newWindow = Toplevel(root)
-    newWindow.title("ET: Tela Inicial")
-    newWindow.geometry("700x300")
+    newWindow.title("Espaço de Tuplas")
+    newWindow.geometry("320x300")
     newWindow.configure(bg='#2288BB')
 
     newWindow.protocol("WM_DELETE_WINDOW", lambda:fecharAplicacao(newWindow))
     
-    labelText = Label(newWindow, text="Gerenciador de Ambientes", width=33, height=5, bg="#FFF00F").grid(row=0, column=1)
+    labelText = Label(newWindow, text="Gerenciador de Ambientes", width=45, height=5, bg="#FFF00F").grid(row=0)
     
-    labelText = Label(newWindow, text="", width=33, bg='#2288BB').grid(row=1, column=0)
-    labelText = Label(newWindow, text="", width=33, bg='#2288BB').grid(row=1, column=1)
-    labelText = Label(newWindow, text="", width=33, bg='#2288BB').grid(row=1, column=2)
+    labelText = Label(newWindow, text="", width=33, bg='#2288BB').grid(row=1)
     
-    criarNuvemButton = Button(newWindow,text="Criar Nuvem", width=30,command=lambda:janelaConfNuvem()).grid(row=2,column=0)    
-    verNuvemButton = Button(newWindow,text="Ver Nuvens", width=30,command=lambda:print("Abrir lista de nuvens")).grid(row=2,column=1)
+    confNuvemButton = Button(newWindow,text="Configurar Nuvem", width=40,command=lambda:janelaConfNuvem()).grid(row=2)    
+    confHostButton = Button(newWindow,text="Configurar Host", width=40, command=lambda:janelaConfHost()).grid(row=3)  
+    confVMButton = Button(newWindow,text="Configurar VM", width=40,command=lambda:janelaConfVM()).grid(row=4)    
+    confProcessoButton = Button(newWindow,text="Configurar Processo",width=40, command=lambda:janelaConfProcesso()).grid(row=5)    
     
-    criarHostButton = Button(newWindow,text="Criar Host", width=30, command=lambda:janelaConfHost()).grid(row=3,column=0)  
-    verHostButton = Button(newWindow,text="Ver Hosts", width=30,command=lambda:print("Abrir lista de hosts")).grid(row=3,column=1)
-    
-    #criarVMLabel = Label(newWindow, text="Nome do VM").grid(row=4,column=0)
-    criarVMButton = Button(newWindow,text="Criar VM", width=30,command=lambda:janelaConfVM()).grid(row=4,column=0)    
-    verVMButton = Button(newWindow,text="Ver VMs", width=30,command=lambda:print("Abrir lista de hosts")).grid(row=4,column=1)
-    
-    #criarProcessoLabel = Label(newWindow, text="Nome do Processo").grid(row=5,column=0)
-    criarProcessoButton = Button(newWindow,text="Criar Processo",width=30, command=lambda:janelaConfProcesso()).grid(row=5,column=0)    
-    verProcessoButton = Button(newWindow,text="Ver Processos",width=30, command=lambda:print("Abrir lista de hosts")).grid(row=5,column=1)   
-
 def clickCriarNuvem(ts, nomeNuvem, Toplevel):
-    criarNuvem(ts, nomeNuvem)
-    fecharJanelaTopLevel(Toplevel)
+    nuvens = listarNuvens(ts)
+    
+    if(nomeNuvem != ""):
+        if (nomeNuvem in nuvens):
+            janelaNomeRepetido()
+        else:
+            criarNuvem(ts, nomeNuvem)
+            fecharJanelaTopLevel(Toplevel)
+    else:
+        janelaNomeVazio()
+    
+def clickExcluirNuvem(ts, nomeNuvem, Toplevel):
+    if(nomeNuvem != ""):
+        deletarNuvem(ts, nomeNuvem)
+        fecharJanelaTopLevel(Toplevel)
+    else:
+        janelaNomeVazio()
 
 def janelaConfNuvem():
     global tse
@@ -300,40 +337,128 @@ def janelaConfNuvem():
     listagemNuvens(textArea)
     
     criarNuvemLabel = Label(newNuvemWindow, width = 60, text="", bg='#888888').grid(row=3)
-    criarNuvemLabel = Label(newNuvemWindow, text="Cadastrar nova nuvem").grid(row=4)
-    criarNuvemLabel = Label(newNuvemWindow, text="Nome da Nuvem").grid(row=5)
-    nuvemEntry = Entry(newNuvemWindow)
-    nuvemEntry.grid(row=6)
-    criarNuvemButton = Button(newNuvemWindow,text="Criar Nuvem", width=30, command=lambda:clickCriarNuvem(tse, nuvemEntry.get(),newNuvemWindow)).grid(row=7)
+    criarNuvemLabel = Label(newNuvemWindow, text="Cadastrar nova nuvem", bg='#FFF').grid(row=4)
+    criarNuvemLabel = Label(newNuvemWindow, width = 60, text="", bg='#888888').grid(row=5)
+    criarNuvemLabel = Label(newNuvemWindow, text="Nome da Nuvem", bg='#888888').grid(row=6)
+    nuvemEntry = Entry(newNuvemWindow, width = 50)
+    nuvemEntry.grid(row=7)
+    criarNuvemButton = Button(newNuvemWindow,text="Criar Nuvem", width=30, command=lambda:clickCriarNuvem(tse, nuvemEntry.get(),newNuvemWindow))
+    criarNuvemButton.grid(row=8)
     
+    removerNuvemLabel = Label(newNuvemWindow, width = 60, text="", bg='#888888').grid(row=9)
+    removerNuvemLabel = Label(newNuvemWindow, text="Excluir nuvem", bg='#FFF').grid(row=10)
+    removerNuvemLabel = Label(newNuvemWindow, width = 60, text="", bg='#888888').grid(row=11)
+    removerNuvemLabel = Label(newNuvemWindow, text="Nome da Nuvem", bg='#888888').grid(row=12)
+    removerEntry = Entry(newNuvemWindow, width = 50)
+    removerEntry.grid(row=13)
+    removerNuvemButton = Button(newNuvemWindow,text="Excluir Nuvem", width=30, command=lambda:clickExcluirNuvem(tse, removerEntry.get(),newNuvemWindow))
+    removerNuvemButton.grid(row=14)
 
+def clickCriarHost(ts, nomeHost, nomeNuvem, Toplevel):
+    hosts = listarHosts(ts)
+    nuvens = listarNuvens(ts)
+    
+    if(nomeHost != "" and nomeNuvem!= ""):
+        if (nomeNuvem in nuvens):
+            if (nomeHost in hosts):
+                janelaNomeRepetido()
+            else:
+                criarHost(ts, nomeHost)
+                entrarNuvem(ts, nomeHost, nomeNuvem)
+                fecharJanelaTopLevel(Toplevel)
+        else:
+            janelaConteinerPaiInexistente()
+    else:
+        janelaNomeVazio()
+    
+'''    
+def clickExcluirHost(ts, nomeHost, Toplevel):
+    deletarHost(ts, nomeHost)
+    sairNuvem(ts, nomeHost)
+    fecharJanelaTopLevel(Toplevel)
+'''    
 def janelaConfHost():
     newHostWindow = Toplevel(root)
     newHostWindow.title("ET: Configuração de Host")
-    newHostWindow.geometry("600x200")
+    newHostWindow.geometry("400x400")
     newHostWindow.configure(bg='#888888')
     newHostWindow.protocol("WM_DELETE_WINDOW", lambda:fecharJanelaTopLevel(newHostWindow))
     
     criarHostLabel = Label(newHostWindow, text="Configuração de Host").grid(row=1)
-    criarHostLabel = Label(newHostWindow, text="Nome da Host").grid(row=2)
-    textArea = ScrolledText(newHostWindow, wrap = WORD, width = 40, height = 5, bg="#FFF", font = ("Callibri",9))
-    textArea.grid(row=3)
+    textAreaNuvens = ScrolledText(newHostWindow, wrap = WORD, width = 40, height = 3, bg="#FFF", font = ("Callibri",9))
+    textAreaNuvens.grid(row=3)
     
-    listagemHosts(textArea)
+    listagemNuvens(textAreaNuvens)
+    
+    textAreaHosts = ScrolledText(newHostWindow, wrap = WORD, width = 40, height = 3, bg="#FFF", font = ("Callibri",9))
+    textAreaHosts.grid(row=4)
+    listagemHosts(textAreaHosts)
+    
+    criarHostLabel = Label(newHostWindow, width = 60, text="", bg='#888888').grid(row=5)
+    criarHostLabel = Label(newHostWindow, text="Cadastrar novo host", bg='#FFF').grid(row=6)
+    criarHostLabel = Label(newHostWindow, width = 60, text="", bg='#888888').grid(row=7)
+    criarHostLabel = Label(newHostWindow, text="Nome do Host", bg='#888888').grid(row=8)
+    hostEntry = Entry(newHostWindow, width = 50)
+    hostEntry.grid(row=9)
+    criarHostLabel = Label(newHostWindow, text="Informe a Nuvem em que deseja adicionar o Host", bg='#888888').grid(row=10)
+    hostEntryNuvem = Entry(newHostWindow, width = 50)
+    hostEntryNuvem.grid(row=11)
+    
+    criarHostButton = Button(newHostWindow,text="Criar Host", width=30, command=lambda:clickCriarHost(tse, hostEntry.get(), hostEntryNuvem.get(),newHostWindow))
+    criarHostButton.grid(row=12)
+    
+    criarHostLabel = Label(newHostWindow, width = 60, text="", bg='#888888').grid(row=13)
+    criarHostLabel = Label(newHostWindow, text="Verificar Hosts por Nuvem", bg='#FFF').grid(row=14)
+    criarHostLabel = Label(newHostWindow, text="Informe o nome da Nuvem", bg='#888888').grid(row=15)
+    hostVerEntry = Entry(newHostWindow, width = 50)
+    hostVerEntry.grid(row=16)
+    
+    verHostButton = Button(newHostWindow,text="Ver Host", width=30, command=lambda:print(hostVerEntry.get()))
+    verHostButton.grid(row=17)
 
+def clickCriarVM(ts, nomeVM, nomeHost, Toplevel):
+    criarVM(ts, nomeVM)
+    entrarHost(ts, nomeVM, nomeHost)
+    fecharJanelaTopLevel(Toplevel)
+    
 def janelaConfVM():
     newVMWindow = Toplevel(root)
     newVMWindow.title("ET: Configuração de VM")
-    newVMWindow.geometry("400x200")
+    newVMWindow.geometry("400x400")
     newVMWindow.configure(bg='#888888')
     newVMWindow.protocol("WM_DELETE_WINDOW", lambda:fecharJanelaTopLevel(newVMWindow))
     
     criarVMLabel = Label(newVMWindow, text="Configuração de VM").grid(row=1)
-    criarVMLabel = Label(newVMWindow, text="Nome da VM").grid(row=2)
-    textArea = ScrolledText(newVMWindow, wrap = WORD, width = 50, height = 6.5, bg="#FFF", font = ("Callibri",9))
-    textArea.grid(row=3)
+    textAreaHosts = ScrolledText(newVMWindow, wrap = WORD, width = 40, height = 3, bg="#FFF", font = ("Callibri",9))
+    textAreaHosts.grid(row=3)
     
-    listagemVMs(textArea)
+    listagemHosts(textAreaHosts)
+    
+    textAreaVMs = ScrolledText(newVMWindow, wrap = WORD, width = 40, height = 3, bg="#FFF", font = ("Callibri",9))
+    textAreaVMs.grid(row=4)
+    listagemVMs(textAreaVMs)
+    
+    criarVMLabel = Label(newVMWindow, width = 60, text="", bg='#888888').grid(row=5)
+    criarVMLabel = Label(newVMWindow, text="Cadastrar novo host", bg='#FFF').grid(row=6)
+    criarVMLabel = Label(newVMWindow, width = 60, text="", bg='#888888').grid(row=7)
+    criarVMLabel = Label(newVMWindow, text="Nome do VM", bg='#888888').grid(row=8)
+    hostEntry = Entry(newVMWindow, width = 50)
+    hostEntry.grid(row=9)
+    criarVMLabel = Label(newVMWindow, text="Informe a Host em que deseja adicionar o VM", bg='#888888').grid(row=10)
+    hostEntryHost = Entry(newVMWindow, width = 50)
+    hostEntryHost.grid(row=11)
+    
+    criarVMButton = Button(newVMWindow,text="Criar VM", width=30, command=lambda:clickCriarVM(tse, hostEntry.get(), hostEntryHost.get(),newVMWindow))
+    criarVMButton.grid(row=12)
+    
+    criarVMLabel = Label(newVMWindow, width = 60, text="", bg='#888888').grid(row=13)
+    criarVMLabel = Label(newVMWindow, text="Verificar VMs por Host", bg='#FFF').grid(row=14)
+    criarVMLabel = Label(newVMWindow, text="Informe o nome da Host", bg='#888888').grid(row=15)
+    hostVerEntry = Entry(newVMWindow, width = 50)
+    hostVerEntry.grid(row=16)
+    
+    verVMButton = Button(newVMWindow,text="Ver VM", width=30, command=lambda:print(hostVerEntry.get()))
+    verVMButton.grid(row=17)
     
 def janelaConfProcesso():
     newProcessoWindow = Toplevel(root)
@@ -352,16 +477,15 @@ def janelaConfProcesso():
 def listagemNuvens(ScrolledText):
     global tse
     ScrolledText.delete('1.0', END)
-    ScrolledText.insert(tk.INSERT,"[ ! ]: NUVENS: ...\n")
+    ScrolledText.insert(tk.INSERT,"[ ! ]: Nuvens Disponiveis: ...\n")
     lista = listarNuvens(tse)
     ScrolledText.insert(tk.INSERT,str(lista)+"\n")
     print(*lista, sep='\n')
-    ScrolledText.insert(tk.INSERT,"\n\n ...\n") 
 
 def listagemHosts(ScrolledText):
     global tse
     ScrolledText.delete('1.0', END)
-    ScrolledText.insert(tk.INSERT,"[ ! ]: HOSTS: ...\n")
+    ScrolledText.insert(tk.INSERT,"[ ! ]: HOSTS Disponiveis: ...\n")
     lista = listarHosts(tse)
     ScrolledText.insert(tk.INSERT,str(lista)+"\n")
     print(*lista, sep='\n')
