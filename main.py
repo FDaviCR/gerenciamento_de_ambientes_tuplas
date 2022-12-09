@@ -370,6 +370,136 @@ def clickCriarHost(ts, nomeHost, nomeNuvem, Toplevel):
             janelaConteinerPaiInexistente()
     else:
         janelaNomeVazio()
+        
+def clickCriarVM(ts, nomeVM, nomeHost, Toplevel):
+    vms = listarVMs(ts)
+    hosts = listarHosts(ts)
+    
+    if(nomeHost != "" and nomeVM!= ""):
+        if (nomeVM in vms):
+            if (nomeHost in hosts):
+                janelaNomeRepetido()
+            else:
+                criarVM(ts, nomeVM)
+                entrarHost(ts, nomeVM, nomeHost)
+                fecharJanelaTopLevel(Toplevel)
+        else:
+            janelaConteinerPaiInexistente()
+    else:
+        janelaNomeVazio()
+        
+def clickCriarProcesso(ts, nomeProcesso, nomeVM, Toplevel):
+    vms = listarVMs(ts)
+    processos = listarProcessos(ts)
+    
+    if(nomeProcesso != "" and nomeVM!= ""):
+        if (nomeVM in vms):
+            if (nomeProcesso in processos):
+                janelaNomeRepetido()
+            else:
+                criarProcesso(ts, nomeProcesso)
+                entrarVM(ts, nomeProcesso, nomeVM)
+                fecharJanelaTopLevel(Toplevel)
+        else:
+            janelaConteinerPaiInexistente()
+    else:
+        janelaNomeVazio()
+
+def clickExcluirHost(ts, nomeHost, nomeNuvem, Toplevel):
+    if(nomeNuvem != "" and nomeHost!= ""):
+        deletarHost(ts, nomeNuvem)
+        sairNuvem(ts, nomeHost, nomeNuvem)
+        fecharJanelaTopLevel(Toplevel)
+    else:
+        janelaNomeVazio()
+
+def clickExcluirVM(ts, nomeVM, nomeHost, Toplevel):
+    if(nomeHost != "" and nomeVM!= ""):
+        deletarVM(ts, nomeVM)
+        sairHost(ts, nomeVM, nomeHost)
+        fecharJanelaTopLevel(Toplevel)
+    else:
+        janelaNomeVazio()
+        
+def clickExcluirProcesso(ts, nomeProcesso, nomeVM, Toplevel):
+    if(nomeVM != "" and nomeProcesso!= ""):
+        deletarVM(ts, nomeProcesso)
+        sairHost(ts, nomeProcesso, nomeVM)
+        fecharJanelaTopLevel(Toplevel)
+    else:
+        janelaNomeVazio()
+
+def janelaNuvemHosts(ts, nomeNuvem, tela):
+    fecharJanelaTopLevel(tela)
+    nuvemWindow = Toplevel(root)
+    nuvemWindow.title("ET: Nuvem de Hosts")
+    nuvemWindow.geometry("400x400")
+    nuvemWindow.configure(bg='#274360')
+    nuvemWindow.protocol("WM_DELETE_WINDOW", lambda:fecharJanelaTopLevel(nuvemWindow))
+    
+    hostLabel = Label(nuvemWindow, text="Hosts da Nuvem: "+nomeNuvem, width= 40).grid(row=1)
+    
+    textAreaHosts = ScrolledText(nuvemWindow, wrap = WORD, width = 40, height = 3, bg="#FFF", font = ("Callibri",9))
+    textAreaHosts.grid(row=3)
+    
+    listagemHostsDaNuvem(textAreaHosts, nomeNuvem)
+    
+    removerHostLabel = Label(nuvemWindow, width = 60, text="", bg='#274360').grid(row=4)
+    removerHostLabel = Label(nuvemWindow, text="Excluir Host", bg='#FFF').grid(row=5)
+    removerHostLabel = Label(nuvemWindow, width = 60, text="", bg='#274360').grid(row=6)
+    removerHostLabel = Label(nuvemWindow, text="Nome da Host", bg='#274360').grid(row=7)
+    removerEntry = Entry(nuvemWindow, width = 50)
+    removerEntry.grid(row=8)
+    removerHostButton = Button(nuvemWindow,text="Excluir Host", width=30, command=lambda:clickExcluirHost(tse, removerEntry.get(), nomeNuvem, nuvemWindow))
+    removerHostButton.grid(row=9)
+    
+def janelaHostVMs(ts, nomeHost, tela):
+    fecharJanelaTopLevel(tela)
+    hostWindow = Toplevel(root)
+    hostWindow.title("ET: Host de VMs")
+    hostWindow.geometry("400x400")
+    hostWindow.configure(bg='#274360')
+    hostWindow.protocol("WM_DELETE_WINDOW", lambda:fecharJanelaTopLevel(hostWindow))
+    
+    hostLabel = Label(hostWindow, text="VMs do Host: "+nomeHost, width= 40).grid(row=1)
+    
+    textAreaVMs = ScrolledText(hostWindow, wrap = WORD, width = 40, height = 3, bg="#FFF", font = ("Callibri",9))
+    textAreaVMs.grid(row=3)
+    
+    listagemVMsDoHost(textAreaVMs, nomeHost)
+    
+    removerVMLabel = Label(hostWindow, width = 60, text="", bg='#274360').grid(row=4)
+    removerVMLabel = Label(hostWindow, text="Excluir VM", bg='#FFF').grid(row=5)
+    removerVMLabel = Label(hostWindow, width = 60, text="", bg='#274360').grid(row=6)
+    removerVMLabel = Label(hostWindow, text="Nome da VM", bg='#274360').grid(row=7)
+    removerEntry = Entry(hostWindow, width = 50)
+    removerEntry.grid(row=8)
+    removerVMButton = Button(hostWindow,text="Excluir VM", width=30, command=lambda:clickExcluirVM(tse, removerEntry.get(), nomeHost, hostWindow))
+    removerVMButton.grid(row=9)
+    
+def janelaVmProcessos(ts, nomeVM, tela):
+    fecharJanelaTopLevel(tela)
+    vmWindow = Toplevel(root)
+    vmWindow.title("ET: VMs de Processos")
+    vmWindow.geometry("400x400")
+    vmWindow.configure(bg='#274360')
+    vmWindow.protocol("WM_DELETE_WINDOW", lambda:fecharJanelaTopLevel(vmWindow))
+    
+    vmLabel = Label(vmWindow, text="Processos do VM: "+nomeVM, width= 40).grid(row=1)
+    
+    textAreaProcessos = ScrolledText(vmWindow, wrap = WORD, width = 40, height = 3, bg="#FFF", font = ("Callibri",9))
+    textAreaProcessos.grid(row=3)
+    
+    listagemProcessosDaVM(textAreaProcessos, nomeVM)
+    
+    removerVMLabel = Label(vmWindow, width = 60, text="", bg='#274360').grid(row=4)
+    removerVMLabel = Label(vmWindow, text="Excluir VM", bg='#FFF').grid(row=5)
+    removerVMLabel = Label(vmWindow, width = 60, text="", bg='#274360').grid(row=6)
+    removerVMLabel = Label(vmWindow, text="Nome da VM", bg='#274360').grid(row=7)
+    removerEntry = Entry(vmWindow, width = 50)
+    removerEntry.grid(row=8)
+    removerVMButton = Button(vmWindow,text="Excluir VM", width=30, command=lambda:clickExcluirProcesso(tse, removerEntry.get(), nomeVM, vmWindow))
+    removerVMButton.grid(row=9)
                 
 def janelaConfHost():
     newHostWindow = Toplevel(root)
@@ -407,7 +537,7 @@ def janelaConfHost():
     hostVerEntry = Entry(newHostWindow, width = 50)
     hostVerEntry.grid(row=16)
     
-    verHostButton = Button(newHostWindow,text="Ver Host", width=30, command=lambda:print(hostVerEntry.get()))
+    verHostButton = Button(newHostWindow,text="Ver Hosts", width=30, command=lambda:janelaNuvemHosts(tse, hostVerEntry.get(), newHostWindow))
     verHostButton.grid(row=17)
 
 def clickCriarVM(ts, nomeVM, nomeHost, Toplevel):
@@ -463,7 +593,7 @@ def janelaConfVM():
     hostVerEntry = Entry(newVMWindow, width = 50)
     hostVerEntry.grid(row=16)
     
-    verVMButton = Button(newVMWindow,text="Ver VM", width=30, command=lambda:print(hostVerEntry.get()))
+    verVMButton = Button(newVMWindow,text="Ver VMs", width=30, command=lambda:janelaHostVMs(tse, hostVerEntry.get(), newVMWindow))
     verVMButton.grid(row=17)
 
 def clickCriarProcesso(ts, nomeProcesso, nomeVM, Toplevel):
@@ -519,7 +649,7 @@ def janelaConfProcesso():
     vmVerEntry = Entry(newProcessoWindow, width = 50)
     vmVerEntry.grid(row=16)
     
-    verProcessoButton = Button(newProcessoWindow,text="Ver Processo", width=30, command=lambda:print(vmVerEntry.get()))
+    verProcessoButton = Button(newProcessoWindow,text="Ver Processo", width=30, command=lambda:janelaVMProcessos(tse, vmVerEntry.get(), newProcessoWindow))
     verProcessoButton.grid(row=17)
 
 def listagemNuvens(ScrolledText):
@@ -533,30 +663,50 @@ def listagemNuvens(ScrolledText):
 def listagemHosts(ScrolledText):
     global tse
     ScrolledText.delete('1.0', END)
-    ScrolledText.insert(tk.INSERT,"[ ! ]: HOSTS Disponiveis: ...\n")
+    ScrolledText.insert(tk.INSERT,"[ ! ]: Hosts Disponiveis: ...\n")
     lista = listarHosts(tse)
     ScrolledText.insert(tk.INSERT,str(lista)+"\n")
     print(*lista, sep='\n')
-    ScrolledText.insert(tk.INSERT,"\n\n ...\n") 
 
 def listagemVMs(ScrolledText):
     global tse
     ScrolledText.delete('1.0', END)
-    ScrolledText.insert(tk.INSERT,"[ ! ]: VMS: ...\n")
+    ScrolledText.insert(tk.INSERT,"[ ! ]: VMs Disponiveis: ...\n")
     lista = listarVMs(tse)
     ScrolledText.insert(tk.INSERT,str(lista)+"\n")
     print(*lista, sep='\n')
-    ScrolledText.insert(tk.INSERT,"\n\n ...\n") 
 
 def listagemProcessos(ScrolledText):
     global tse
     ScrolledText.delete('1.0', END)
-    ScrolledText.insert(tk.INSERT,"[ ! ]: PROCESSOS: ...\n")
+    ScrolledText.insert(tk.INSERT,"[ ! ]: Processos Disponiveis: ...\n")
     lista = listarProcessos(tse)
     ScrolledText.insert(tk.INSERT,str(lista)+"\n")
     print(*lista, sep='\n')
-    ScrolledText.insert(tk.INSERT,"\n\n ...\n") 
 
+def listagemHostsDaNuvem(ScrolledText, nomeNuvem):
+    global tse
+    ScrolledText.delete('1.0', END)
+    ScrolledText.insert(tk.INSERT,"[ ! ]: Hosts na Nuvem: ...\n")
+    lista = listarIntegrantesNuvem(tse, nomeNuvem)
+    ScrolledText.insert(tk.INSERT,str(lista)+"\n")
+    print(*lista, sep='\n')
+
+def listagemVMsDoHost(ScrolledText, nomeHost):
+    global tse
+    ScrolledText.delete('1.0', END)
+    ScrolledText.insert(tk.INSERT,"[ ! ]: VMs no Host: ...\n")
+    lista = listarIntegrantesHost(tse, nomeHost)
+    ScrolledText.insert(tk.INSERT,str(lista)+"\n")
+    print(*lista, sep='\n')
+    
+def listagemProcessosDaVM(ScrolledText, nomeVM):
+    global tse
+    ScrolledText.delete('1.0', END)
+    ScrolledText.insert(tk.INSERT,"[ ! ]: Processos na VM: ...\n")
+    lista = listarIntegrantesVM(tse, nomeVM)
+    ScrolledText.insert(tk.INSERT,str(lista)+"\n")
+    print(*lista, sep='\n')
 
 '''
 -----------------------------------------------------------------------------------------
