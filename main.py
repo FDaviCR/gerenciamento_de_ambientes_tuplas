@@ -370,13 +370,7 @@ def clickCriarHost(ts, nomeHost, nomeNuvem, Toplevel):
             janelaConteinerPaiInexistente()
     else:
         janelaNomeVazio()
-    
-'''    
-def clickExcluirHost(ts, nomeHost, Toplevel):
-    deletarHost(ts, nomeHost)
-    sairNuvem(ts, nomeHost)
-    fecharJanelaTopLevel(Toplevel)
-'''    
+                
 def janelaConfHost():
     newHostWindow = Toplevel(root)
     newHostWindow.title("ET: Configuração de Host")
@@ -417,9 +411,21 @@ def janelaConfHost():
     verHostButton.grid(row=17)
 
 def clickCriarVM(ts, nomeVM, nomeHost, Toplevel):
-    criarVM(ts, nomeVM)
-    entrarHost(ts, nomeVM, nomeHost)
-    fecharJanelaTopLevel(Toplevel)
+    hosts = listarHosts(ts)
+    vms = listarVMs(ts)
+    
+    if(nomeVM != "" and nomeHost!= ""):
+        if (nomeHost in hosts):
+            if (nomeVM in vms):
+                janelaNomeRepetido()
+            else:
+                criarVM(ts, nomeVM)
+                entrarHost(ts, nomeVM, nomeHost)
+                fecharJanelaTopLevel(Toplevel)
+        else:
+            janelaConteinerPaiInexistente()
+    else:
+        janelaNomeVazio()
     
 def janelaConfVM():
     newVMWindow = Toplevel(root)
@@ -459,20 +465,62 @@ def janelaConfVM():
     
     verVMButton = Button(newVMWindow,text="Ver VM", width=30, command=lambda:print(hostVerEntry.get()))
     verVMButton.grid(row=17)
+
+def clickCriarProcesso(ts, nomeProcesso, nomeVM, Toplevel):
+    processos = listarProcessos(ts)
+    vms = listarVMs(ts)
     
+    if(nomeVM != "" and nomeProcesso!= ""):
+        if (nomeVM in vms):
+            if (nomeProcesso in processos):
+                janelaNomeRepetido()
+            else:
+                criarProcesso(ts, nomeProcesso)
+                entrarVM(ts, nomeProcesso, nomeVM)
+                fecharJanelaTopLevel(Toplevel)
+        else:
+            janelaConteinerPaiInexistente()
+    else:
+        janelaNomeVazio()
+
 def janelaConfProcesso():
     newProcessoWindow = Toplevel(root)
     newProcessoWindow.title("ET: Configuração de Processo")
-    newProcessoWindow.geometry("400x200")
+    newProcessoWindow.geometry("400x400")
     newProcessoWindow.configure(bg='#888888')
     newProcessoWindow.protocol("WM_DELETE_WINDOW", lambda:fecharJanelaTopLevel(newProcessoWindow))
     
     criarProcessoLabel = Label(newProcessoWindow, text="Configuração de Processo").grid(row=1)
-    criarProcessoLabel = Label(newProcessoWindow, text="Nome da Processo").grid(row=2)
-    textArea = ScrolledText(newProcessoWindow, wrap = WORD, width = 50, height = 6.5, bg="#FFF", font = ("Callibri",9))
-    textArea.grid(row=3)
+    textAreaHosts = ScrolledText(newProcessoWindow, wrap = WORD, width = 40, height = 3, bg="#FFF", font = ("Callibri",9))
+    textAreaHosts.grid(row=3)
     
-    listagemProcessos(textArea)
+    listagemVMs(textAreaHosts)
+    
+    textAreaProcessos = ScrolledText(newProcessoWindow, wrap = WORD, width = 40, height = 3, bg="#FFF", font = ("Callibri",9))
+    textAreaProcessos.grid(row=4)
+    listagemProcessos(textAreaProcessos)
+    
+    criarProcessoLabel = Label(newProcessoWindow, width = 60, text="", bg='#888888').grid(row=5)
+    criarProcessoLabel = Label(newProcessoWindow, text="Cadastrar nova vm", bg='#FFF').grid(row=6)
+    criarProcessoLabel = Label(newProcessoWindow, width = 60, text="", bg='#888888').grid(row=7)
+    criarProcessoLabel = Label(newProcessoWindow, text="Nome do Processo", bg='#888888').grid(row=8)
+    vmEntry = Entry(newProcessoWindow, width = 50)
+    vmEntry.grid(row=9)
+    criarProcessoLabel = Label(newProcessoWindow, text="Informe a Host em que deseja adicionar o Processo", bg='#888888').grid(row=10)
+    vmEntryHost = Entry(newProcessoWindow, width = 50)
+    vmEntryHost.grid(row=11)
+    
+    criarProcessoButton = Button(newProcessoWindow,text="Criar Processo", width=30, command=lambda:clickCriarProcesso(tse, vmEntry.get(), vmEntryHost.get(),newProcessoWindow))
+    criarProcessoButton.grid(row=12)
+    
+    criarProcessoLabel = Label(newProcessoWindow, width = 60, text="", bg='#888888').grid(row=13)
+    criarProcessoLabel = Label(newProcessoWindow, text="Verificar Processos por Host", bg='#FFF').grid(row=14)
+    criarProcessoLabel = Label(newProcessoWindow, text="Informe o nome da Host", bg='#888888').grid(row=15)
+    vmVerEntry = Entry(newProcessoWindow, width = 50)
+    vmVerEntry.grid(row=16)
+    
+    verProcessoButton = Button(newProcessoWindow,text="Ver Processo", width=30, command=lambda:print(vmVerEntry.get()))
+    verProcessoButton.grid(row=17)
 
 def listagemNuvens(ScrolledText):
     global tse
