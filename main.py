@@ -15,7 +15,7 @@ import tkinter.font as font
 tse = None
 
 # Lista que vai registrar o nome dos usuários criados e sua 'flags' de recebimento de novas msgs ('0' quando não detectou nenhuma msg nova e '1' quando detectou)
-lista_registro_nuvens = []
+lista_registro_processos = []
 
 '''
 -----------------------------------------------------------------------------------------
@@ -60,6 +60,9 @@ def criarVM(ts, nomeVM):
 
 # Cria a tupla do Processo e coloca ela na tupla 'PROCESSOS' para ser armazenada
 def criarProcesso(ts, nomeProcesso):
+    lista_temp = [nomeProcesso,0]
+    lista_registro_processos.append(lista_temp)
+
     processos = ts.inp(("PROCESSOS", object))
 
     temp = list(processos[1])
@@ -74,28 +77,24 @@ def criarProcesso(ts, nomeProcesso):
 # Listar TODAS as NUVENS do 'ts' ('Tuple Space')
 def listarNuvens(ts):
     nuvens = ts.rdp(("NUVENS", object))
-    print(nuvens)
     
     return list(nuvens[1])
 
 # Listar TODAS as HOSTS do 'ts' ('Tuple Space')
 def listarHosts(ts):
     hosts = ts.rdp(("HOSTS", object))
-    print(hosts)
     
     return list(hosts[1])
 
 # Listar TODAS as VMS do 'ts' ('Tuple Space')
 def listarVMs(ts):
     vms = ts.rdp(("VMS", object))
-    print(vms)
     
     return list(vms[1])
 
 # Listar TODAS as PROCESSOS do 'ts' ('Tuple Space')
 def listarProcessos(ts):
     processos = ts.rdp(("PROCESSOS", object))
-    print(processos)
     
     return list(processos[1])
 
@@ -107,19 +106,19 @@ def listarProcessos(ts):
 # Lista integrantes de uma sala em específico 'nomeSala' 
 def listarIntegrantesNuvem(ts, nomeNuvem):
     integrantes = ts.rdp(("INTNUVEM", nomeNuvem, object))
-    print(integrantes)
+
     return list(integrantes[2])
 
 # Lista integrantes de uma sala em específico 'nomeSala' 
 def listarIntegrantesHost(ts, nomeHost):
     integrantes = ts.rdp(("INTHOST", nomeHost, object))
-    print(integrantes)
+
     return list(integrantes[2])
 
 # Lista integrantes de uma sala em específico 'nomeSala' 
 def listarIntegrantesVM(ts, nomeVM):
     integrantes = ts.rdp(("INTVM", nomeVM, object))
-    print(integrantes)
+
     return list(integrantes[2])
 
 '''
@@ -133,7 +132,6 @@ def entrarNuvem(ts, nome, nomeNuvem):
     temp = list(integrantes[2])
     temp.append(nome)
     ts.out(("INTNUVEM", nomeNuvem, tuple(temp)))
-    print("Host: " + nome + "entrou na nuvem: " + nomeNuvem)
     
 # Add vm no host em que entrou
 def entrarHost(ts, nome, nomeHost):
@@ -141,7 +139,6 @@ def entrarHost(ts, nome, nomeHost):
     temp = list(integrantes[2])
     temp.append(nome)
     ts.out(("INTHOST", nomeHost, tuple(temp)))
-    print("VM: " + nome + "entrou no host: " + nomeHost)
 
 # Add processo no vm em que entrou
 def entrarVM(ts, nome, nomeVM):
@@ -149,7 +146,6 @@ def entrarVM(ts, nome, nomeVM):
     temp = list(integrantes[2])
     temp.append(nome)
     ts.out(("INTVM", nomeVM, tuple(temp)))
-    print("Processo: " + nome + "entrou na VM: " + nomeVM)
     
 '''
 -----------------------------------------------------------------------------------------
@@ -184,33 +180,46 @@ def sairVM(ts, nome, nomeVM):
 '''
 # Retira a tupla do nuvem da tupla 'NUVENS' aonde foi armazenada
 def deletarNuvem(ts, nome):
-    nuvens = ts.inp(("NUVENS", object))
-    temp = list(nuvens[1])
-    print(temp)
-    temp.remove(nome)
-    ts.out(("NUVENS", tuple(temp)))
+    integNuvem = listarIntegrantesNuvem(tse, nome)
+    
+    if(len(integNuvem) == 0):
+        nuvens = ts.inp(("NUVENS", object))
+        temp = list(nuvens[1])
+        temp.remove(nome)
+        ts.out(("NUVENS", tuple(temp)))
+    else:
+        janelaConteinerNaoVazio()
 
 # Retira a tupla do host da tupla 'HOSTS' aonde foi armazenada
 def deletarHost(ts, nome):
-    hosts = ts.inp(("HOSTS", object))
-    temp = list(hosts[1])
-    print(temp)
-    temp.remove(nome)
-    ts.out(("HOSTS", tuple(temp)))
+    integHost = listarIntegrantesHost(tse, nome)
+    if(len(integHost) == 0):
+        hosts = ts.inp(("HOSTS", object))
+        temp = list(hosts[1])
+
+        temp.remove(nome)
+        ts.out(("HOSTS", tuple(temp)))
+    else:
+        janelaConteinerNaoVazio()
 
 # Retira a tupla do vm da tupla 'VMS' aonde foi armazenada
 def deletarVM(ts, nome):
-    vms = ts.inp(("VMS", object))
-    temp = list(vms[1])
-    print(temp)
-    temp.remove(nome)
-    ts.out(("VMS", tuple(temp)))
+    integVM = listarIntegrantesVM(tse, nome)
+    
+    if(len(integVM) == 0):
+        vms = ts.inp(("VMS", object))
+        temp = list(vms[1])
+
+        temp.remove(nome)
+        ts.out(("VMS", tuple(temp)))
+    else:
+        janelaConteinerNaoVazio()
 
 # Retira a tupla do processo da tupla 'PROCESSOS' aonde foi armazenada
 def deletarProcesso(ts, nome):
     processos = ts.inp(("PROCESSOS", object))
     temp = list(processos[1])
-    print(temp)
+
     temp.remove(nome)
     ts.out(("PROCESSOS", tuple(temp)))
 
@@ -224,15 +233,13 @@ def mandarMensagem(ts, nomeVM, remetente, destinatario, mensagem):
     mensagens = ts.inp(("VM", nomeVM, object))
     temp = list(mensagens[2])
     temp.clear()
-    
     temp.append((destinatario,"<" + remetente + ">: " + mensagem))
-            
     ts.out(("VM", nomeVM, tuple(temp)))
-
+    
 # Retorna a ''última mensagem enviada'' no chat de Tuplas
-def receberMensagem(ts, nomeVM):
+def recebeMensagem(ts, nomeVM):
     mensagens = ts.rdp(("VM", nomeVM, object))
-    #print("Recebe MSG " + str(mensagens))
+    
     return list(mensagens[2])
 
 '''
@@ -264,6 +271,16 @@ def janelaNomeRepetido():
     
     okButton = Button(newAlertWindow, text="OK",command=lambda:fecharJanelaTopLevel(newAlertWindow))
     okButton.grid(row=3)
+
+def janelaConteinerNaoVazio():
+    newAlertWindow = Toplevel(root)
+    newAlertWindow.title("Alerta!")
+    newAlertWindow.geometry("300x100")
+    newAlertWindow.configure(bg='#FFFF00')
+    
+    labelText = Label(newAlertWindow, text="O conteiner não esta vazio!", width=40, height=2, bg="#FFF00F").grid(row=0)
+    okButton = Button(newAlertWindow, text="OK",command=lambda:fecharJanelaTopLevel(newAlertWindow))
+    okButton.grid(row=1)
 
 def janelaNomeVazio():
     newAlertWindow = Toplevel(root)
@@ -323,6 +340,7 @@ def clickExcluirNuvem(ts, nomeNuvem, Toplevel):
         janelaNomeVazio()
 
 def janelaConfNuvem():
+    global lista_registro_processos 
     global tse
     newNuvemWindow = Toplevel(root)
     newNuvemWindow.title("ET: Configuração de Nuvem")
@@ -389,6 +407,8 @@ def clickCriarVM(ts, nomeVM, nomeHost, Toplevel):
         janelaNomeVazio()
         
 def clickCriarProcesso(ts, nomeProcesso, nomeVM, Toplevel):
+    global lista_registro_processos
+    global tse
     vms = listarVMs(ts)
     processos = listarProcessos(ts)
     
@@ -399,7 +419,9 @@ def clickCriarProcesso(ts, nomeProcesso, nomeVM, Toplevel):
             else:
                 criarProcesso(ts, nomeProcesso)
                 entrarVM(ts, nomeProcesso, nomeVM)
+                
                 fecharJanelaTopLevel(Toplevel)
+                
         else:
             janelaConteinerPaiInexistente()
     else:
@@ -500,6 +522,16 @@ def janelaVmProcessos(ts, nomeVM, tela):
     removerEntry.grid(row=8)
     removerVMButton = Button(vmWindow,text="Excluir VM", width=30, command=lambda:clickExcluirProcesso(tse, removerEntry.get(), nomeVM, vmWindow))
     removerVMButton.grid(row=9)
+    
+    acessarProcessoLabel = Label(vmWindow, width = 60, text="", bg='#274360').grid(row=10)
+    acessarProcessoLabel = Label(vmWindow, text="Exibir Processo", bg='#FFF').grid(row=11)
+    acessarProcessoLabel = Label(vmWindow, width = 60, text="", bg='#274360').grid(row=12)
+    acessarProcessoLabel = Label(vmWindow, text="Nome do Processo", bg='#274360').grid(row=13)
+    acessarProcessoEntry = Entry(vmWindow, width = 50)
+    acessarProcessoEntry.grid(row=14)
+    acessarProcessoButton = Button(vmWindow,text="Abrir Processo", width=30, command=lambda:janelaProcesso(acessarProcessoEntry.get(), nomeVM))
+    acessarProcessoButton.grid(row=15)
+    
                 
 def janelaConfHost():
     newHostWindow = Toplevel(root)
@@ -636,7 +668,7 @@ def janelaConfProcesso():
     criarProcessoLabel = Label(newProcessoWindow, text="Nome do Processo", bg='#888888').grid(row=8)
     vmEntry = Entry(newProcessoWindow, width = 50)
     vmEntry.grid(row=9)
-    criarProcessoLabel = Label(newProcessoWindow, text="Informe a Host em que deseja adicionar o Processo", bg='#888888').grid(row=10)
+    criarProcessoLabel = Label(newProcessoWindow, text="Informe a VM em que deseja adicionar o Processo", bg='#888888').grid(row=10)
     vmEntryHost = Entry(newProcessoWindow, width = 50)
     vmEntryHost.grid(row=11)
     
@@ -644,69 +676,137 @@ def janelaConfProcesso():
     criarProcessoButton.grid(row=12)
     
     criarProcessoLabel = Label(newProcessoWindow, width = 60, text="", bg='#888888').grid(row=13)
-    criarProcessoLabel = Label(newProcessoWindow, text="Verificar Processos por Host", bg='#FFF').grid(row=14)
-    criarProcessoLabel = Label(newProcessoWindow, text="Informe o nome da Host", bg='#888888').grid(row=15)
+    criarProcessoLabel = Label(newProcessoWindow, text="Verificar Processos por VM", bg='#FFF').grid(row=14)
+    criarProcessoLabel = Label(newProcessoWindow, text="Informe o nome da VM", bg='#888888').grid(row=15)
     vmVerEntry = Entry(newProcessoWindow, width = 50)
     vmVerEntry.grid(row=16)
     
-    verProcessoButton = Button(newProcessoWindow,text="Ver Processo", width=30, command=lambda:janelaVMProcessos(tse, vmVerEntry.get(), newProcessoWindow))
+    verProcessoButton = Button(newProcessoWindow,text="Ver Processo", width=30, command=lambda:janelaVmProcessos(tse, vmVerEntry.get(), newProcessoWindow))
     verProcessoButton.grid(row=17)
 
+# Envia a mensagem do usuário para as outras Tuplas de usuários na sala                                  
+def envia_mensagem(entry_widget,nomeProcesso,vmAtual,destinatario):
+    global tse 
+    global lista_registro_processos
+    msg = entry_widget
+    
+    if(msg != ""):
+        mandarMensagem(tse, vmAtual, nomeProcesso, destinatario, msg)
+        for i in range(len(lista_registro_processos)): 
+            lista_registro_processos[i][1] = 1 # <-- 'Setamos' a flag de todos os usuários na lista que armazena seus nomes e suas flags para o valor de '1'!
+
+# Envia a mensagem do usuário para as outras Tuplas de usuários na sala ('Loop' que checa por novas mensagens enviadas)
+def recebe_mensagens(newWindowInput,ScrolledText,nomeProcesso,vmAtual):
+    global tse
+    global lista_registro_processos    
+    msg_recebida = recebeMensagem(tse, vmAtual)
+    
+    
+    for i in lista_registro_processos:
+        if i[0] == nomeProcesso:
+            if i[1] == 1: # <--  verifica se o usuário em específico está com sua flag como '1', se tiver, o usuário atualizará as msgs do seu chat pois há novas msgs!
+                if(msg_recebida[0][0] == nomeProcesso):
+                    ScrolledText.insert(tk.INSERT,"Nova mensagem:\n")
+                    ScrolledText.insert(tk.INSERT,msg_recebida[0][1]+"\n", 'msg')
+                    i[1] = 0
+            else:
+                pass   
+
+    newWindowInput.after(1,lambda:recebe_mensagens(newWindowInput,ScrolledText,nomeProcesso,vmAtual))
+
+    
+def janelaProcesso(processo, vm):
+    global lista_registro_processos
+    global tse
+    
+    processoWindow = Toplevel(root)
+    processoWindow.title("ET: Processo: "+processo)
+    processoWindow.geometry("400x400")
+    processoWindow.configure(bg='#888888')
+    processoWindow.protocol("WM_DELETE_WINDOW", lambda:fecharJanelaTopLevel(processoWindow))
+    
+    criarProcessoLabel = Label(processoWindow, text="Mensagens Recebidas").grid(row=1)
+    textAreaProcessos = ScrolledText(processoWindow, wrap = WORD, width = 40, height = 5, bg="#0F0", font = ("Callibri",9))
+    textAreaProcessos.grid(row=3)
+    
+    textAreaProcessos.insert(tk.INSERT, "Mensagens recebidas...\n")
+    
+    criarProcessoLabel = Label(processoWindow, text="Enviar Mensagem").grid(row=4)
+    criarProcessoLabel = Label(processoWindow, text="Destinatario").grid(row=5)
+    destinatarioEntry = Entry(processoWindow, width = 50)
+    destinatarioEntry.grid(row=6)
+    
+    criarProcessoLabel = Label(processoWindow, text="Mensagem").grid(row=7)
+    mensagemEntry = Entry(processoWindow, width = 50)
+    mensagemEntry.grid(row=8)
+    
+    verProcessoButton = Button(processoWindow,text="Enviar Mensagem", width=30, command=lambda:envia_mensagem(mensagemEntry.get(), processo, vm, destinatarioEntry.get()))
+    verProcessoButton.grid(row=9)
+    
+    processoWindow.after(1,lambda:recebe_mensagens(processoWindow, textAreaProcessos, processo, vm))
+    
 def listagemNuvens(ScrolledText):
+    global lista_registro_processos
     global tse
     ScrolledText.delete('1.0', END)
     ScrolledText.insert(tk.INSERT,"[ ! ]: Nuvens Disponiveis: ...\n")
     lista = listarNuvens(tse)
     ScrolledText.insert(tk.INSERT,str(lista)+"\n")
-    print(*lista, sep='\n')
+
 
 def listagemHosts(ScrolledText):
+    global lista_registro_processos
     global tse
     ScrolledText.delete('1.0', END)
     ScrolledText.insert(tk.INSERT,"[ ! ]: Hosts Disponiveis: ...\n")
     lista = listarHosts(tse)
     ScrolledText.insert(tk.INSERT,str(lista)+"\n")
-    print(*lista, sep='\n')
+
 
 def listagemVMs(ScrolledText):
+    global lista_registro_processos
     global tse
     ScrolledText.delete('1.0', END)
     ScrolledText.insert(tk.INSERT,"[ ! ]: VMs Disponiveis: ...\n")
     lista = listarVMs(tse)
     ScrolledText.insert(tk.INSERT,str(lista)+"\n")
-    print(*lista, sep='\n')
+
 
 def listagemProcessos(ScrolledText):
+    global lista_registro_processos
     global tse
     ScrolledText.delete('1.0', END)
     ScrolledText.insert(tk.INSERT,"[ ! ]: Processos Disponiveis: ...\n")
     lista = listarProcessos(tse)
     ScrolledText.insert(tk.INSERT,str(lista)+"\n")
-    print(*lista, sep='\n')
+
 
 def listagemHostsDaNuvem(ScrolledText, nomeNuvem):
+    global lista_registro_processos
     global tse
     ScrolledText.delete('1.0', END)
     ScrolledText.insert(tk.INSERT,"[ ! ]: Hosts na Nuvem: ...\n")
     lista = listarIntegrantesNuvem(tse, nomeNuvem)
     ScrolledText.insert(tk.INSERT,str(lista)+"\n")
-    print(*lista, sep='\n')
+
 
 def listagemVMsDoHost(ScrolledText, nomeHost):
+    global lista_registro_processos
     global tse
     ScrolledText.delete('1.0', END)
     ScrolledText.insert(tk.INSERT,"[ ! ]: VMs no Host: ...\n")
     lista = listarIntegrantesHost(tse, nomeHost)
     ScrolledText.insert(tk.INSERT,str(lista)+"\n")
-    print(*lista, sep='\n')
+
     
 def listagemProcessosDaVM(ScrolledText, nomeVM):
+    global lista_registro_processos
     global tse
     ScrolledText.delete('1.0', END)
     ScrolledText.insert(tk.INSERT,"[ ! ]: Processos na VM: ...\n")
     lista = listarIntegrantesVM(tse, nomeVM)
     ScrolledText.insert(tk.INSERT,str(lista)+"\n")
-    print(*lista, sep='\n')
+
 
 '''
 -----------------------------------------------------------------------------------------
